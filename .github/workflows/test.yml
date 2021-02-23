@@ -1,0 +1,31 @@
+---
+name: Test
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.7.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install molecule docker
+
+      - name: Run tests.
+        run: |
+          cd roles/download && molecule test
+          cd ../prereq && molecule test
+          cd ../reset && molecule test
