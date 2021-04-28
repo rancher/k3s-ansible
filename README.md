@@ -53,8 +53,45 @@ ansible-playbook site.yml -i inventory/my-cluster/hosts.ini
 
 ## Kubeconfig
 
-To get access to your **Kubernetes** cluster just
+The following describes how to get remote access to your k3s **Kubernetes** cluster.
+
+### Prerequisites
+
+- The master node must have a publicly exposed IP address.
+- The master node must allow traffic to and from port 6443.
+
+### Simple Method
 
 ```bash
-scp debian@master_ip:~/.kube/config ~/.kube/config
+cp ~/.kube/config ~/.kube/config.bak
+scp debian@master_ip:.kube/config ~/.kube/config
+```
+
+The above assumes you are only accessing a single cluster.
+You can now access your cluster with `kubectl`
+
+### Advanced Method; Multiple Cluster Access
+
+```bash
+scp debian@master_ip:.kube/config ~/.kube/config-k3s
+export KUBECONFIG=$HOME/.kube/config:$HOME/.kube/config-k3s
+```
+
+Update the IP address in the `server` field in `$HOME/.kube/config-k3s` to the master node's publicly exposed IP address.
+
+To avoid conflicts with any existing kubeconfig entries also do the following:
+
+The value `my-k3s-cluster` used below is only an example, any other value that doesn't already exist within your kubeconfig files can be used.
+
+- Update the `name` field under `cluster` to `my-k3s-cluster`.
+- Update the `name` field under `context` to `my-k3s-cluster`.
+- Update the `cluster` field under `context` to `my-k3s-cluster`.
+- Update the `current-context` field to `my-k3s-cluster`.
+
+#### Point kubectl to your k3s cluster
+
+Switch to the `my-k3s-cluster` context with `kubectl config`.
+
+```bash
+kubectl config use-context my-k3s-cluster
 ```
