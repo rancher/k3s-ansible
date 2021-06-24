@@ -1,5 +1,5 @@
 ---
-k3s_version: v1.17.5+k3s1
+k3s_version: v1.21.1+k3s1
 ansible_user: debian
 systemd_dir: /etc/systemd/system
 
@@ -9,8 +9,12 @@ systemd_dir: /etc/systemd/system
 # first node fails.
 # Also you should define k3s_token so that masters can talk together securely
 
-apiserver_endpoint: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+apiserver_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
 # k3s_token: "mysupersecuretoken"
+
+# Enable virtual IP address on server nodes to provide control plane api high availability
+# Be sure to update the apiserver_endpoint with a dedicated IP address that is not in use by the cluster
+# keepalived_enabled: true
 
 extra_server_args: ""
 extra_agent_args: ""

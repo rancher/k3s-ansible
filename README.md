@@ -19,7 +19,7 @@ on processor architecture:
 ## System requirements
 
 Deployment environment must have Ansible 2.4.0+
-Master and nodes must have passwordless SSH access
+Server and agent nodes must have passwordless SSH access
 
 ## Usage
 
@@ -32,22 +32,34 @@ cp -R inventory/sample inventory/my-cluster
 Second, edit `inventory/my-cluster/hosts.ini` to match the system information gathered above. For example:
 
 ```bash
-[master]
+[server]
 192.16.35.12
 
-[node]
+[agent]
 192.16.35.[10:11]
 
 [k3s_cluster:children]
-master
-node
+server
+agent
 ```
 
-If multiple hosts are in the master group, the playbook will automatically setup k3s in HA mode with etcd.
+If needed, you can also edit `inventory/my-cluster/group_vars/all.yml` to match your environment.
+
+### Control Plane High Availability
+
+If multiple hosts are in the server group, the playbook will automatically setup k3s in HA mode with etcd.
 https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/
 This requires at least k3s version 1.19.1
 
-If needed, you can also edit `inventory/my-cluster/group_vars/all.yml` to match your environment.
+To configure fail-over for the k3s server api add the following to your `inventory/my-cluster/group_vars/all.yml`
+
+```yaml
+apiserver_endpoint: 192.168.30.10  # update this to a non-cluster ip address
+
+keepalived_enabled: true
+```
+
+See `inventory/sample-ha` for a sample high availability control plane configuration.
 
 Start provisioning of the cluster using the following command:
 
