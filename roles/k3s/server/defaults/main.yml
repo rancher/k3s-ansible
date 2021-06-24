@@ -1,5 +1,7 @@
 ---
 
+keepalived_enabled: false
+
 ansible_user: root
 server_init_args: >-
   {% if groups['server'] | length > 1 %}
